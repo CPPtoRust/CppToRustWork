@@ -1,8 +1,8 @@
 pub struct Bool_Array
 {
-    _size: u32,
-    _iteration_number: u32,
-    _storage_array: Vec<u32>,
+    pub _size: u32,
+    pub _iteration_number: u32,
+    pub _storage_array: Vec<u32>,
 }
 
 impl Bool_Array {
@@ -13,7 +13,6 @@ impl Bool_Array {
             _storage_array : vec![0; size as usize],
         }
 
-        // implement the print after doing options file
     }
 
     #[inline]
@@ -41,17 +40,6 @@ impl Bool_Array {
     }
 }
 
-// impl Drop for Bool_Array {
-//     fn drop(&mut self) {
-//         std::mem::drop(self._storage_array);
-//     }
-// }
-// fn main() {
-//     // println!("Hello, world!");
-//     let mut ba = Bool_Array::new(10);
-//     ba.set_bit(1);
-//     ba.clear();
-//     ba.set_bit(1);
-//     ba.clear();
-//     ba.set_bit(1);
-// }
+fn main() {
+    
+}

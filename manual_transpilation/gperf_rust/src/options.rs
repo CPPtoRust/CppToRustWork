@@ -2,8 +2,8 @@
 mod positions;
 use positions::{Positions, PositionIterator};
 
-extern crate getopts;
-use getopts::{Options};
+extern crate clap;
+use clap::{App, Arg};
 
 use std::io::{Write};
 use std::env;
@@ -96,67 +96,67 @@ use std::env;
 pub struct Options1 {
 
     /* Records count of command-line arguments.  */
-    _argument_count: i32,
+    pub _argument_count: i32,
     
     /* Stores a pointer to command-line argument vector.  */
-    _argument_vector: Vec<String> ,
+    pub _argument_vector: Vec<String> ,
     
     /* Holds the boolean options.  */
-    _option_word: i32,
+    pub _option_word: i32,
     
     /* Name of input file.  */
-    _input_file_name: String,
+    pub _input_file_name: String,
     
     /* Name of output file.  */
-    _output_file_name: String,
+    pub _output_file_name: String,
     
     /* The output language.  */
-    _language: String,
+    pub _language: String,
     
     /* Jump length when trying alternative values.  */
-    _jump: i32,
+    pub _jump: i32,
     
     /* Initial value for asso_values table.  */
-    _initial_asso_value: i32,
+    pub _initial_asso_value: i32,
     
     /* Number of attempts at finding good asso_values.  */
-    _asso_iterations: i32,
+    pub _asso_iterations: i32,
     
     /* Number of switch statements to generate.  */
-    _total_switches: i32,
+    pub _total_switches: i32,
     
     /* Factor by which to multiply the generated table's size.  */
-    _size_multiple: f32,
+    pub _size_multiple: f32,
     
     /* Names used for generated lookup function.  */
-    _function_name: String,
+    pub _function_name: String,
     
     /* Name used for keyword key.  */
-    _slot_name: String,
+    pub _slot_name: String,
     
     /* Suffix for empty struct initializers.  */
-    _initializer_suffix: String,
+    pub _initializer_suffix: String,
     
     /* Name used for generated C++ class.  */
-    _class_name: String,
+    pub _class_name: String,
     
     /* Name used for generated hash function.  */
-    _hash_name: String,
+    pub _hash_name: String,
     
     /* Name used for hash table array.  */
-    _wordlist_name: String,
+    pub _wordlist_name: String,
     
     /* Name used for length table array.  */
-    _lengthable_name: String,
+    pub _lengthable_name: String,
     
     /* Name used for the string pool.  */
-    _stringpool_name: String,
+    pub _stringpool_name: String,
     
     /* Separates keywords from other attributes.  */
-    _delimiters: String,
+    pub _delimiters: String,
     
     /* Contains user-specified key choices.  */
-    _key_positions: Positions
+    pub _key_positions: Positions
 
 }
 
@@ -220,6 +220,7 @@ fn transfer_ownership(s: String) -> String {
     String::from(s)
 }
 
+
 impl Options1 {
      
     /* Constructor.  */
@@ -250,122 +251,156 @@ impl Options1 {
 
     /* Parses the options given in the command-line arguments.  */   
     pub fn parse_options(&mut self) {
-
+        
         self._argument_vector = std::env::args().collect();
         self._argument_count = self._argument_vector.len() as i32;
         let program_name = self._argument_vector[0].clone();
         
+        // println!("Argument Vector = {:?}\n", self._argument_vector);
+
         let VERSION: String = String::from(env!("CARGO_PKG_VERSION"));
         
-        let mut opts = Options::new();
-        
-        opts.optopt(std::char::from_u32(CHAR_MAX + 1).unwrap().encode_utf8(&mut [0; 4]), "output-file", "", "");
-        opts.optflag(std::char::from_u32(CHAR_MAX + 2).unwrap().encode_utf8(&mut [0; 4]), "ignore-case", "");
-        opts.optopt("e", "delimiters", "", "");
-        opts.optflag("t", "struct-type", "");
-        opts.optopt("L", "language", "", "");
-        opts.optopt("K", "slot-name", "", "");
-        opts.optopt("F", "initializer-suffix", "", "");
-        opts.optopt("H", "hash-fn-name", "", "");
-        opts.optopt("H", "hash-function-name", "", "");
-        opts.optopt("N", "lookup-fn-name", "", "");
-        opts.optopt("N", "lookup-function-name", "", "");
-        opts.optopt("Z", "class-name", "", "");
-        opts.optflag("7", "seven-bit", "");
-        opts.optflag("c", "compare-strncmp", "");
-        opts.optflag("C", "readonly-tables", "");
-        opts.optflag("E", "enum", "");
-        opts.optflag("I", "includes", "");
-        opts.optflag("G", "global-table", "");
-        opts.optopt("W", "word-array-name", "", "");
-        opts.optopt(std::char::from_u32(CHAR_MAX + 4).unwrap().encode_utf8(&mut [0; 4]), "length-table-name", "", "");
-        opts.optopt("S", "switch", "", "");
-        opts.optflag("T", "omit-struct-type", "");
-        opts.optopt("k", "key-positions", "", "");
-        opts.optflag("l", "compare-strlen", "");
-        opts.optflag("l", "compare-lengths", "");
-        opts.optflag("D", "duplicates", "");
-        opts.optopt("f", "fast", "", "");
-        opts.optopt("i", "initial-asso", "", "");
-        opts.optopt("j", "jump", "", "");
-        opts.optopt("m", "multiple-iterations", "", "");
-        opts.optflag("n", "no-strlen", "");
-        opts.optflag("o", "occurence-sort", "");
-        opts.optflag("O", "optimized-collision-resolution", "");
-        opts.optflag("P", "pic", "");
-        opts.optopt("Q", "string-pool-name", "", "");
-        opts.optflag(std::char::from_u32(CHAR_MAX + 3).unwrap().encode_utf8(&mut [0; 4]), "null-strings", "");
-        opts.optflag("r", "random", "");
-        opts.optopt("s", "size-multiple", "", "");
-        opts.optflag("h", "help", "");
-        opts.optflag("v", "version", "");
-        opts.optflag("d", "debug", "");
+        // opts.optopt((CHAR_MAX + 1).to_string().as_str(), "output-file", "", "");
+        // opts.optflag(std::char::from_u32(CHAR_MAX + 2).unwrap().to_string().as_str(), "ignore-case", "");
+        // opts.optopt("e", "delimiters", "", "");
+        // opts.optflag("t", "struct-type", "");
+        // opts.optopt("L", "language", "", "");
+        // opts.optopt("K", "slot-name", "", "");
+        // opts.optopt("F", "initializer-suffix", "", "");
+        // opts.optopt("H", "hash-fn-name", "", "");
+        // opts.optopt("H", "hash-function-name", "", "");
+        // opts.optopt("N", "lookup-fn-name", "", "");
+        // opts.optopt("N", "lookup-function-name", "", "");
+        // opts.optopt("Z", "class-name", "", "");
+        // opts.optflag("7", "seven-bit", "");
+        // opts.optflag("c", "compare-strncmp", "");
+        // opts.optflag("C", "readonly-tables", "");
+        // opts.optflag("E", "enum", "");
+        // opts.optflag("I", "includes", "");
+        // opts.optflag("G", "global-table", "");
+        // opts.optopt("W", "word-array-name", "", "");
+        // // opts.optopt(std::char::from_u32(CHAR_MAX + 4).unwrap().to_string().as_str(), "length-table-name", "", "");
+        // opts.optopt("S", "switch", "", "");
+        // opts.optflag("T", "omit-struct-type", "");
+        // opts.optopt("k", "key-positions", "", "");
+        // opts.optflag("l", "compare-strlen", "");
+        // opts.optflag("l", "compare-lengths", "");
+        // opts.optflag("D", "duplicates", "");
+        // opts.optopt("f", "fast", "", "");
+        // opts.optopt("i", "initial-asso", "", "");
+        // opts.optopt("j", "jump", "", "");
+        // opts.optopt("m", "multiple-iterations", "", "");
+        // opts.optflag("n", "no-strlen", "");
+        // opts.optflag("o", "occurence-sort", "");
+        // opts.optflag("O", "optimized-collision-resolution", "");
+        // opts.optflag("P", "pic", "");
+        // opts.optopt("Q", "string-pool-name", "", "");
+        // // opts.optflag(std::char::from_u32(CHAR_MAX + 3).unwrap().to_string().as_str(), "null-strings", "");
+        // opts.optflag("r", "random", "");
+        // opts.optopt("s", "size-multiple", "", "");
+        // opts.optflag("h", "help", "");
+        // opts.optflag("v", "version", "");
+        // opts.optflag("d", "debug", "");
     
         
-        let matches = match opts.parse(&self._argument_vector[1..]) {
-            Ok(m) => m,
-            Err(_) => {
-                self.short_usage("stderr", &program_name);
-                std::process::exit(1);
-            }
-        };
-    
-        if matches.opt_present("a") {
+        let matches = App::new("MyApp")
+        .version("0.1")
+            .arg(Arg::with_name("e").short("e").long("delimiters").help("").takes_value(true))
+            .arg(Arg::with_name("t").short("t").long("struct-type").help("").takes_value(false))
+            .arg(Arg::with_name("L").short("L").long("language").help("").takes_value(true))
+            .arg(Arg::with_name("K").short("K").long("slot-name").help("").takes_value(true))
+            .arg(Arg::with_name("F").short("F").long("initializer-suffix").help("").takes_value(true))
+            .arg(Arg::with_name("H").short("H").long("hash-fn-name").help("").takes_value(true))
+            // .arg(Arg::with_name("H2").short("H").long("hash-function-name").help("").takes_value(true))
+            .arg(Arg::with_name("N").short("N").long("lookup-fn-name").help("").takes_value(true))
+            // .arg(Arg::with_name("N2").short("N").long("lookup-function-name").help("").takes_value(true))
+            .arg(Arg::with_name("Z").short("Z").long("class-name").help("").takes_value(true))
+            .arg(Arg::with_name("7").short("7").long("seven-bit").help("").takes_value(false))
+            .arg(Arg::with_name("c").short("c").long("compare-strncmp").help("").takes_value(false))
+            .arg(Arg::with_name("C").short("C").long("readonly-tables").help("").takes_value(false))
+            .arg(Arg::with_name("E").short("E").long("enum").help("").takes_value(false))
+            .arg(Arg::with_name("I").short("I").long("includes").help("").takes_value(false))
+            .arg(Arg::with_name("G").short("G").long("global-table").help("").takes_value(false))
+            .arg(Arg::with_name("W").short("W").long("word-array-name").help("").takes_value(true))
+            .arg(Arg::with_name("S").short("S").long("switch").help("").takes_value(true))
+            .arg(Arg::with_name("T").short("T").long("omit-struct-type").help("").takes_value(false))
+            .arg(Arg::with_name("k").short("k").long("key-positions").help("").takes_value(true))
+            .arg(Arg::with_name("l").short("l").long("compare-strlen").help("").takes_value(false))
+            // .arg(Arg::with_name("l2").short("l").long("compare-lengths").help("").takes_value(false))
+            .arg(Arg::with_name("D").short("D").long("duplicates").help("").takes_value(false))
+            .arg(Arg::with_name("f").short("f").long("fast").help("").takes_value(true))
+            .arg(Arg::with_name("i").short("i").long("initial-asso").help("").takes_value(true))
+            .arg(Arg::with_name("j").short("j").long("jump").help("").takes_value(true))
+            .arg(Arg::with_name("m").short("m").long("multiple-iterations").help("").takes_value(true))
+            .arg(Arg::with_name("n").short("n").long("no-strlen").help("").takes_value(false))
+            .arg(Arg::with_name("o").short("o").long("occurence-sort").help("").takes_value(false))
+            .arg(Arg::with_name("O").short("O").long("optimized-collision-resolution").help("").takes_value(false))
+            .arg(Arg::with_name("P").short("P").long("pic").help("").takes_value(false))
+            .arg(Arg::with_name("Q").short("Q").long("string-pool-name").help("").takes_value(true))
+            .arg(Arg::with_name("r").short("r").long("random").help("").takes_value(false))
+            .arg(Arg::with_name("s").short("s").long("size-multiple").help("").takes_value(true))
+            .arg(Arg::with_name("h").short("h").long("help").help("").takes_value(false))
+            .arg(Arg::with_name("d").short("d").long("debug").help("").takes_value(false))
+            .arg(Arg::with_name("v").short("v").long("version").help("").takes_value(false))
+            .get_matches()
+            ;
+
+        if matches.is_present("a") == true {
             
         } 
     
-        if matches.opt_present("c") {
+        if matches.is_present("c") {
             self._option_word |= COMP;
         }
     
-        if matches.opt_present("C") {
+        if matches.is_present("C") {
             self._option_word |= CONST;    
         }
     
-        if matches.opt_present("d") {
+        if matches.is_present("d") {
             self._option_word |= DEBUG;    
             eprint!("Starting program {}, version {}, with debugging on.\n",
                             program_name, VERSION);
         }
     
-        if matches.opt_present("D") {
+        if matches.is_present("D") {
             self._option_word |= DUP;
         }
     
-        if let Some(x) = matches.opt_str("e") {
-            self._delimiters = x;
+        if let Some(x) = matches.value_of("e") {
+            self._delimiters = x.to_string();
         }
     
-        if matches.opt_present("E") {
+        if matches.is_present("E") {
             self._option_word |= ENUM;
         }
     
-        if matches.opt_present("f") {
+        if matches.is_present("f") {
             
         }
     
-        if let Some(x) = matches.opt_str("F") {
-            self._initializer_suffix = x;
+        if let Some(x) = matches.value_of("F") {
+            self._initializer_suffix = x.to_string();
         }
     
-        if matches.opt_present("g") {
+        if matches.is_present("g") {
     
         }
     
-        if matches.opt_present("G") {
+        if matches.is_present("G") {
             self._option_word |= GLOBAL;
         }
     
-        if matches.opt_present("h") {
+        if matches.is_present("h") {
             self.long_usage("stdout", &program_name);
             std::process::exit(0);
         }
     
-        if let Some(x) = matches.opt_str("H") {
-            self._hash_name = x;
+        if let Some(x) = matches.value_of("H") {
+            self._hash_name = x.to_string();
         } 
     
-        if let Some(x) = matches.opt_str("i") {
+        if let Some(x) = matches.value_of("i") {
             self._initial_asso_value = x.parse().unwrap();
             if self._initial_asso_value < 0 {
                 eprint!("Initial value {} should be non-zero, ignoring and continuing.\n", self._initial_asso_value);
@@ -376,11 +411,11 @@ impl Options1 {
             // }
         }
     
-        if matches.opt_present("I") {
+        if matches.is_present("I") {
             self._option_word |= INCLUDE;
         }
     
-        if let Some(x) =  matches.opt_str("j") {
+        if let Some(x) =  matches.value_of("j") {
             self._jump = x.parse().unwrap();
             if self._jump < 0 {
                 eprint!("Jump value {} must be a positive number.\n", self._jump);
@@ -393,9 +428,9 @@ impl Options1 {
     
         }
     
-        if let Some(y) = matches.opt_str("k") {
+        if let Some(y) = matches.value_of("k") {
             
-            let x: &str = y.as_str();
+            let x: &str = y;
             self._option_word |= POSITIONS;
     
             let BAD_VALUE: i32 = -3;
@@ -459,20 +494,20 @@ impl Options1 {
             }
         }
             
-        if let Some(x) = matches.opt_str("K") {
-            self._slot_name = x;
+        if let Some(x) = matches.value_of("K") {
+            self._slot_name = x.to_string();
         }
     
-        if matches.opt_present("l") {
+        if matches.is_present("l") {
             self._option_word |= LENTABLE;
         }
     
-        if let Some(x) = matches.opt_str("L") {
+        if let Some(x) = matches.value_of("L") {
             self._language = String::from("");
-            self.set_language(&x);
+            self.set_language(&x.to_string());
         }
     
-        if let Some(x) = matches.opt_str("m") {
+        if let Some(x) = matches.value_of("m") {
             self._asso_iterations = x.parse().unwrap();
             if self._asso_iterations < 0 {
                 eprint!("asso_iterations value must not be negative, assuming 0\n");
@@ -480,35 +515,35 @@ impl Options1 {
             }
         }
     
-        if matches.opt_present("n") {
+        if matches.is_present("n") {
             self._option_word |= NOLENGTH;
         }
     
-        if let Some(x) = matches.opt_str("N") {
-            self._function_name = x;
+        if let Some(x) = matches.value_of("N") {
+            self._function_name = x.to_string();
         }
     
-        if matches.opt_present("o") {
+        if matches.is_present("o") {
     
         }
         
-        if matches.opt_present("O") {
+        if matches.is_present("O") {
             
         }
     
-        if matches.opt_present("p") {
+        // if matches.is_present("p") {
             
-        }
+        // }
     
-        if matches.opt_present("P") {
+        if matches.is_present("P") {
             self._option_word |= SHAREDLIB;
         }
     
-        if let Some(x) = matches.opt_str("Q") {
-            self._stringpool_name = x;
+        if let Some(x) = matches.value_of("Q") {
+            self._stringpool_name = x.to_string();
         }
     
-        if matches.opt_present("r") {
+        if matches.is_present("r") {
             self._option_word = RANDOM;
             if (self._initial_asso_value != 0) {
                 eprint!("warning, -r option supersedes -i, disabling -i option and continuing\n");
@@ -516,7 +551,7 @@ impl Options1 {
         }
     
     
-        if let Some(x) = matches.opt_str("s") {
+        if let Some(x) = matches.value_of("s") {
             
             let mut numerator: f32 = 0.0;
             let mut denominator: f32 = 1.0;
@@ -564,7 +599,7 @@ impl Options1 {
             }
         }
     
-        if let Some(x) = matches.opt_str("S") {
+        if let Some(x) = matches.value_of("S") {
             self._option_word |= SWITCH;
             self._total_switches = x.parse().unwrap();
     
@@ -576,15 +611,16 @@ impl Options1 {
     
         } 
     
-        if matches.opt_present("t") {
+        if matches.is_present("t") {
             self._option_word |= TYPE;
         }
     
-        if matches.opt_present("T") {
+        if matches.is_present("T") {
             self._option_word |= NOTYPE;
         }
     
-        if matches.opt_present("v") {
+        if matches.is_present("v") {
+            println!("Entered 2.0");
             print!("GNU gperf {}\n", VERSION);
             print!("Copyright (C) {} Free Software Foundation, Inc.\n\
                     License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
@@ -598,33 +634,33 @@ impl Options1 {
         }
     
     
-        if let Some(x) = matches.opt_str("W") {
-            self._wordlist_name = x;
+        if let Some(x) = matches.value_of("W") {
+            self._wordlist_name = x.to_string();
         }
     
-        if let Some(x) = matches.opt_str("Z") {
-            self._class_name = x;
+        if let Some(x) = matches.value_of("Z") {
+            self._class_name = x.to_string();
         }
     
-        if let Some(x) = matches.opt_str("7") {
+        if let Some(x) = matches.value_of("7") {
             self._option_word |= SEVENBIT;
         }
     
-        if let Some(x) = matches.opt_str(std::char::from_u32(CHAR_MAX + 1).unwrap().encode_utf8(&mut [0; 4])) {
-            self._output_file_name = x;
-        }
+        // if let Some(x) = matches.value_of(std::char::from_u32(CHAR_MAX + 1).unwrap().encode_utf8(&mut [0; 4])) {
+        //     self._output_file_name = x.to_string();
+        // }
     
-        if matches.opt_present(std::char::from_u32(CHAR_MAX + 2).unwrap().encode_utf8(&mut [0; 4])) {
-            self._option_word |= UPPERLOWER;
-        }
+        // if matches.is_present(std::char::from_u32(CHAR_MAX + 2).unwrap().encode_utf8(&mut [0; 4])) {
+        //     self._option_word |= UPPERLOWER;
+        // }
     
-        if matches.opt_present(std::char::from_u32(CHAR_MAX + 3).unwrap().encode_utf8(&mut [0; 4])) {
-            self._option_word |= NULLSTRINGS;
-        }
+        // if matches.is_present(std::char::from_u32(CHAR_MAX + 3).unwrap().encode_utf8(&mut [0; 4])) {
+        //     self._option_word |= NULLSTRINGS;
+        // }
     
-        if let Some(x) = matches.opt_str(std::char::from_u32(CHAR_MAX + 4).unwrap().encode_utf8(&mut [0; 4])) {
-            self._lengthable_name = x;
-        }
+        // if let Some(x) = matches.value_of(std::char::from_u32(CHAR_MAX + 4).unwrap().encode_utf8(&mut [0; 4])) {
+        //     self._lengthable_name = x.to_string();
+        // }
     
 
     }
@@ -635,7 +671,6 @@ impl Options1 {
 
         let mut i: i32 = 0;
         while (i < self._argument_count) {
-
             let mut arg: &str = self._argument_vector[i as usize].as_str();
             let mut arg_idx: usize = 0;
             /* Escape arg if it contains shell metacharacters.  */
@@ -652,7 +687,7 @@ impl Options1 {
                         print!("{}", x);
                         arg_idx += 1;
                         x = arg.chars().nth(arg_idx).unwrap();
-                        if(x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z' || x == '-') {
+                        if(!(x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z' || x == '-')) {
                             break;
                         }
                     }
@@ -668,7 +703,7 @@ impl Options1 {
                 if arg.find('\\') != None {
                     print!("\"");
                     let x = arg.chars().nth(arg_idx).unwrap();
-                    while (x != '\0') {
+                    while arg_idx < arg.chars().count() {
                         if (x == '\"' || x == '\\' || x == '$' || x == '`') {
                             print!("\\");
                         }
@@ -680,7 +715,7 @@ impl Options1 {
                 } else {
                     print!("\'");
                     let mut x = arg.chars().nth(arg_idx).unwrap();
-                    while x !='\0' {
+                    while arg_idx < arg.chars().count() {
                         x = arg.chars().nth(arg_idx).unwrap();
                         if (x == '\\') {
                             print!("\\");
@@ -1226,5 +1261,10 @@ impl PositionStringParser {
         }
 
     }
+
+}
+
+
+fn main() {
 
 }

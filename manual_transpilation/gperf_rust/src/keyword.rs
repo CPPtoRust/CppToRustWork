@@ -1,14 +1,14 @@
 #[path = "positions.rs"]
-pub mod positions;
+mod positions;
 use positions::{Positions, PositionIterator, PositionReverseIterator};
 
 use std::process;
 
 
 #[inline]
-fn sort_char_set(base: &mut [u32], len: i32) {
+pub fn sort_char_set(base: &mut [u32], len: i32) {
 
-    for i in 1..len + 1 {
+    for i in 1..len {
         
         let mut j: usize = i as usize;
         let tmp: u32 = base[j];
@@ -25,10 +25,10 @@ fn sort_char_set(base: &mut [u32], len: i32) {
 
 /* Declaring Keyword */
 
-#[derive(Default, Copy, Clone)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct Keyword<'a>{
-    pub(crate) _allchars: &'a str,
-    pub(crate) _allchars_length: i32,
+    pub _allchars: &'a str,
+    pub _allchars_length: i32,
     pub _rest: &'a str,
     pub _lineno: u32
 }
@@ -58,13 +58,13 @@ impl KeywordExt<'_>{
         while true {
             
             i = iter.next();
-            if i == -2 {
+            if i == PositionIterator::EOS {
                 break;
             }
 
             let mut c: u32;
             
-            if i == -1 {
+            if i == Positions::LASTCHAR {
                 c = self.keyword._allchars.chars().nth(self.keyword._allchars_length as usize - 1).unwrap() as u32;
             } else if i < self.keyword._allchars_length {
                 c = self.keyword._allchars.chars().nth(i as usize).unwrap() as u32;
@@ -112,7 +112,7 @@ impl KeywordExt<'_>{
     }
 
 
-    pub fn delete_selchars(&self){
+    fn delete_selchars(&self){
         //std::mem::drop(self._selchars);
         
     }
@@ -125,3 +125,7 @@ struct Keyword_Factory {
 }
 
 static empty_string: [char; 1] = ['\0'];
+
+fn main() {
+
+}
